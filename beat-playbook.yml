@@ -1,0 +1,47 @@
+---
+- name: Configure Filebeat and Metricbeat onto DVWA machines
+  hosts: webservers
+  become: true
+  tasks:
+    - name: download filebeat .deb file
+      command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.4.0-amd64.deb
+      args:
+        warn: no
+    - name: install the .deb file
+      command: dpkg -i filebeat-7.4.0-amd64.deb
+      args:
+        warn: no
+    - name: copy filebeat config file to machine
+      copy:
+        src: /etc/ansible/files/filebeat-config.yml
+        dest: /etc/filebeat/filebeat.yml
+    - name: enable system module
+      command: filebeat modules enable system
+    - name: setup filebeat
+      command: filebeat setup
+    - name: start filebeat
+      service:
+        name: filebeat
+        state: started
+        enabled: yes
+    - name: download metricbeat .deb file
+      command: curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-7.4.0-amd64.deb
+      args:
+        warn: no
+    - name: install the .deb file
+      command: dpkg -i metricbeat-7.4.0-amd64.deb
+      args:
+        warn: no
+    - name: copy filebeat config file to machine
+      copy:
+        src: /etc/ansible/files/metricbeat-config.yml
+        dest: /etc/filebeat/metricbeat.yml
+    - name: enable docker module
+      command: metricbeat modules enable docker
+    - name: setup metricbeat
+      command: metricbeat setup
+    - name: start metricbeat
+      service:
+        name: metricbeat
+        state: started
+        enabled: yes

@@ -1,0 +1,15 @@
+---
+- name: Removing Metricbeat and Filebeat
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Delete beats packages
+      shell: rm -rf /home/sysadmin/*beat*.deb
+    - name: Uninstall filebeat
+      apt:
+        name: filebeat
+        state: absent
+    - name: Uninstall metricbeat
+      apt:
+        name: metricbeat
+        state: absent
